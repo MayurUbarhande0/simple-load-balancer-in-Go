@@ -1,0 +1,48 @@
+documentation for simple load balancer .....
+
+STRCT DEFINED
+ a)backend
+ b)serverpool
+ 
+a)backend
+type Backend struct {
+	Url   *url.URL
+	Alive bool
+	Mux   sync.Mutex
+
+	Reverse_proxy *httputil.ReverseProxy
+}
+b)serverpool
+type Serverpool struct {
+	Backend []*Backend
+	Mux     sync.Mutex
+	Current int
+}
+
+//func Getnextpeer() {
+	this func increase the Current by + using modulo as the current should not go out of index then the slice of the backend 
+
+}
+//func pingserver(){
+  this func ping the the backend to this is func is to be used indise the headlth check so that we can monitor the Alive
+  satus of the backend 
+  this ping out the server every 500ms 
+
+}
+
+//func healthcheck(){
+	this func inheirat the pool *serverpool.backend (slice) 
+	this is an goroutine which is fired every 500ms(but for simility we keep it sleep or 5*time.second)
+	so that all fuck offf
+}
+
+
+
+//routes
+the entry point is set at :4000 and after that we use a LBhandler
+LBhandler handles the request using round robin for which it uses helper func getnextpeer as well as healthcheck
+so that all fuck off
+
+
+//backend ports 
+currently active :8000 and :8081
