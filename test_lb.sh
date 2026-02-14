@@ -1,6 +1,17 @@
 #!/bin/bash
 
 # Script to test the load balancer
+set -e  # Exit on error
+set -u  # Exit on undefined variable
+
+# Check for required tools
+command -v curl >/dev/null 2>&1 || { echo "Error: curl is required but not installed." >&2; exit 1; }
+
+# Check if jq is available (optional, for pretty printing)
+HAS_JQ=false
+if command -v jq >/dev/null 2>&1; then
+    HAS_JQ=true
+fi
 
 echo "Testing Load Balancer..."
 echo "======================="
@@ -21,15 +32,23 @@ echo ""
 # Test health endpoint
 echo "2. Testing /health endpoint..."
 echo "Response:"
-curl -s "${LB_URL}/health" | jq . || curl -s "${LB_URL}/health"
-echo ""
+if [ "$HAS_JQ" = true ]; then
+    curl -s "${LB_URL}/health" | jq .
+else
+    curl -s "${LB_URL}/health"
+    echo ""
+fi
 echo ""
 
 # Test metrics endpoint
 echo "3. Testing /metrics endpoint..."
 echo "Response:"
-curl -s "${LB_URL}/metrics" | jq . || curl -s "${LB_URL}/metrics"
-echo ""
+if [ "$HAS_JQ" = true ]; then
+    curl -s "${LB_URL}/metrics" | jq .
+else
+    curl -s "${LB_URL}/metrics"
+    echo ""
+fi
 echo ""
 
 # Test load balancing
@@ -52,7 +71,12 @@ echo ""
 
 # Check metrics after load
 echo "6. Final metrics..."
-curl -s "${LB_URL}/metrics" | jq . || curl -s "${LB_URL}/metrics"
+if [ "$HAS_JQ" = true ]; then
+    curl -s "${LB_URL}/metrics" | jq .
+else
+    curl -s "${LB_URL}/metrics"
+    echo ""
+fi
 echo ""
 
 echo "======================="

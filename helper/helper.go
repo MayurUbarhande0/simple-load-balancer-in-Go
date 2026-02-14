@@ -92,13 +92,19 @@ func RetryableReverseProxy(pool *models.ServerPool, maxRetries int) http.Handler
 	return func(w http.ResponseWriter, r *http.Request) {
 		attempts := 0
 		for attempts < maxRetries {
+			attempts++
 			peer := GetNextPeer(pool)
 			if peer == nil {
-				http.Error(w, "No healthy backends available", http.StatusServiceUnavailable)
-				return
+				if attempts >= maxRetries {
+					http.Error(w, "No healthy backends available", http.StatusServiceUnavailable)
+					return
+				}
+				continue
 			}
 
-			// Try to serve the request
+			// Create a custom response writer to capture errors
+			// For now, we'll just serve the request - retry logic would need
+			// more sophisticated error detection
 			peer.ReverseProxy.ServeHTTP(w, r)
 			return
 		}
