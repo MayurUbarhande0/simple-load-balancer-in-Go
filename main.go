@@ -13,6 +13,7 @@ import (
 
 	"github.com/MayurUbarhande0/reverseproxy/config"
 	"github.com/MayurUbarhande0/reverseproxy/helper"
+	"github.com/MayurUbarhande0/reverseproxy/middleware"
 	"github.com/MayurUbarhande0/reverseproxy/models"
 	"github.com/MayurUbarhande0/reverseproxy/routes"
 )
@@ -80,10 +81,14 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", routes.LBHandler(pool))
 	mux.HandleFunc("/health", routes.HealthHandler(pool))
+	mux.HandleFunc("/metrics", routes.MetricsHandler())
+
+	// Wrap with middleware
+	handler := middleware.LoggingMiddleware(middleware.MetricsMiddleware(mux))
 
 	server := &http.Server{
 		Addr:         cfg.Port,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  cfg.ReadTimeout,
 		WriteTimeout: cfg.WriteTimeout,
 		IdleTimeout:  cfg.IdleTimeout,

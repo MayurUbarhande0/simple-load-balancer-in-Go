@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MayurUbarhande0/reverseproxy/helper"
+	"github.com/MayurUbarhande0/reverseproxy/middleware"
 	"github.com/MayurUbarhande0/reverseproxy/models"
 )
 
@@ -33,3 +34,13 @@ func HealthHandler(pool *models.ServerPool) http.HandlerFunc {
 		json.NewEncoder(w).Encode(stats)
 	}
 }
+
+// MetricsHandler returns request metrics
+func MetricsHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		metrics := middleware.GetMetrics()
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(metrics)
+	}
+}
+
