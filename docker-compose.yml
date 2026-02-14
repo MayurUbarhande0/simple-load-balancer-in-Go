@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  loadbalancer:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend1
+      - backend2
+    environment:
+      - CONFIG_FILE=config.json
+    networks:
+      - lb-network
+
+  backend1:
+    image: golang:1.25.3-alpine
+    working_dir: /app
+    volumes:
+      - ./examples:/app
+    command: go run backend.go -port 8081
+    expose:
+      - "8081"
+    networks:
+      - lb-network
+
+  backend2:
+    image: golang:1.25.3-alpine
+    working_dir: /app
+    volumes:
+      - ./examples:/app
+    command: go run backend.go -port 8082
+    expose:
+      - "8082"
+    networks:
+      - lb-network
+
+networks:
+  lb-network:
+    driver: bridge
