@@ -1,0 +1,12 @@
+{
+  "port": ":8080",
+  "health_check_interval": 10000000000,
+  "read_timeout": 15000000000,
+  "write_timeout": 15000000000,
+  "idle_timeout": 60000000000,
+  "backends": [
+    "http://localhost:8081",
+    "http://localhost:8082",
+    "http://localhost:8083"
+  ]
+}
